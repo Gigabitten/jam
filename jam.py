@@ -20,7 +20,6 @@ def main():
     done = False
     while not done:
         clock.tick(FPS)
-        frame = frame + 1
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 done = True
