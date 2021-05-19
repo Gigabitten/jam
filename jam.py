@@ -1,6 +1,9 @@
 import pygame
 import consts
 import gridObject as go
+import vehicle as v
+import building as b
+import parking as p
 
 WIN = pygame.display.set_mode((1280, 720), pygame.RESIZABLE)
 pygame.display.set_caption("Jam")
@@ -10,6 +13,7 @@ class Game():
     def __init__(self):
         self.displayGridLines = True
         self.grid = []
+        self.stepNum = 0        
         self.main()
 
     def create_window(self, newDims):
@@ -41,10 +45,18 @@ class Game():
     def initGrid(self):
         self.grid.append(go.GridObject(WIN, (1,10)))
         self.grid.append(go.GridObject(WIN, (5,8), consts.GREEN, (3,4)))
+        self.grid.append(v.Vehicle(WIN, (10, 10), consts.RED))
+        self.grid.append(b.Building(WIN, (15, 3)))
+        self.grid.append(p.Parking(WIN, (15, 6)))
 
     def handleKeypress(self, key):
         if key == pygame.K_g:
             self.displayGridLines = not self.displayGridLines
+
+    def step(self):
+        for gridObj in self.grid:
+            gridObj.step(self.stepNum)
+        self.stepNum += 1
 
     def main(self):
         clock = pygame.time.Clock()
@@ -60,6 +72,7 @@ class Game():
                     done = True
                 if event.type == pygame.KEYDOWN:
                     self.handleKeypress(event.key)
+            self.step()
             self.draw_window()
         pygame.quit()
 

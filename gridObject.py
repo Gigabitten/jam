@@ -9,11 +9,14 @@ class GridObject():
         self._rect = pygame.Rect(pos, size)
         self._color = color
 
+    def shapeInfo(self):
+        return self._rect.x, self._rect.y, self._rect.width, self._rect.height
+
     def draw(self):
         pygame.draw.rect(self._win, self._color, self._rect)
 
     def pos(self):
         return self._rect.topleft
 
-    def step(self):
+    def step(self, stepNum):
         pass
