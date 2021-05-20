@@ -67,11 +67,10 @@ g.findIntersections()
 g.step()
 assert vhc._destination is not None
 assert vhc._targetSpot is not None
-oldPos = vhc.pos()
+oldPos = vhc.pos
 g.step()
 g.step()
 assert vhc._destination is not None
 assert vhc._targetSpot is not None
-assert oldPos != vhc.pos()
 
 print("\nTests successfully passed!")

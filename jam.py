@@ -147,8 +147,8 @@ class Game():
         self.addParking((6, 3))
         self.addParking((10, 2))
         self.addVehicle((0, 0), c.RED)
-        #self.addVehicle((6, 4), c.BLUE)
-        #self.addVehicle((7, 9), c.GREEN)
+        self.addVehicle((6, 4), c.BLUE)
+        self.addVehicle((7, 9), c.GREEN)
 
     def handleKeypress(self, key):
         if key == pygame.K_g:
