@@ -81,26 +81,23 @@ class Vehicle(go.GridObject):
                 if self._targetSpot.pos[0] > self.pos[0]:
                     prefs.append(0)
                     prefs.append(1)
-                    horizDone = True
+                    prefs.append(2)
+                    prefs.append(3)                    
                 elif self._targetSpot.pos[0] < self.pos[0]:
                     prefs.append(1)
                     prefs.append(0)
-                    horizDone = True                    
+                    prefs.append(2)
+                    prefs.append(3)                    
                 elif self._targetSpot.pos[1] > self.pos[1]:
                     prefs.append(2)
-                    prefs.append(3)
-                elif self._targetSpot.pos[1] < self.pos[1]:
-                    prefs.append(3)
-                    prefs.append(2)
-                else:
-                    prefs = [1, 2]
-                    horizDone = True
-                if horizDone:
-                    prefs.append(2)
-                    prefs.append(3)
-                else:
                     prefs.append(0)
                     prefs.append(1)
+                    prefs.append(3)                    
+                elif self._targetSpot.pos[1] < self.pos[1]:
+                    prefs.append(3)
+                    prefs.append(0)
+                    prefs.append(1)
+                    prefs.append(2)                    
 
                 x, y = self._rect.topleft
                 posX, posY = self.pos
