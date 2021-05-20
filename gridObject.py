@@ -4,9 +4,10 @@ import visible as vis
 
 class GridObject(vis.Visible):
     def __init__(self, pos = (0, 0), color = consts.BLUE, size = (1, 1)):
-        pos = (pos[0] * consts.TILESIZE, pos[1] * consts.TILESIZE)
-        size = (size[0] * consts.TILESIZE, size[1] * consts.TILESIZE)
-        self._rect = pygame.Rect(pos, size)
+        self._pos = pos
+        size = (size[0] * 32, size[1] * 32)
+        x, y = pos[0] * 32, pos[1] * 32
+        self._rect = pygame.Rect((x, y), size)
         self._color = color
 
     def shapeInfo(self):
@@ -15,8 +16,12 @@ class GridObject(vis.Visible):
     def draw(self, win):
         pygame.draw.rect(win, self._color, self._rect)
 
+    @property
     def pos(self):
-        return self._rect.topleft
+        return self._pos
 
-    def step(self):
+    def setPos(self, newPos):
+        self._pos = newPos
+
+    def step(self, cache, vehicLocs, buildings, spots):
         pass

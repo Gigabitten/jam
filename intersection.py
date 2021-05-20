@@ -11,7 +11,7 @@ class Intersection(d.Drivable):
     def draw(self, win):
         x, y = self._pos[0], self._pos[1]
         pygame.draw.rect(win, self._color, pygame.Rect((x - 32, y - 32), (2 * 32, 2 * 32)))
-        pygame.draw.line(win, consts.STOPRED, (x - 32, y + 24), (x - 32, y + 32))
-        pygame.draw.line(win, consts.STOPRED, (x + 32, y - 32), (x + 32, y - 24))
-        pygame.draw.line(win, consts.STOPRED, (x - 32, y - 32), (x - 24, y - 32))
-        pygame.draw.line(win, consts.STOPRED, (x + 24, y + 32), (x + 32, y + 32))
+        # pygame.draw.line(win, consts.STOPRED, (x - 32, y + 24), (x - 32, y + 32))
+        # pygame.draw.line(win, consts.STOPRED, (x + 32, y - 32), (x + 32, y - 24))
+        # pygame.draw.line(win, consts.STOPRED, (x - 32, y - 32), (x - 24, y - 32))
+        # pygame.draw.line(win, consts.STOPRED, (x + 24, y + 32), (x + 32, y + 32))

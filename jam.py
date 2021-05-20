@@ -1,5 +1,5 @@
 import pygame
-import consts
+import consts as c
 import gridObject as go
 import vehicle as v
 import building as b
@@ -15,12 +15,14 @@ class Game():
     def __init__(self):
         self.displayGridLines = False
         self.grid = []
-        self.stepNum = 0
         # ticks per frame
         self.tickInterval = 60
         self.xAxisRoads = []
         self.yAxisRoads = []
         self.intersections = []
+        self.cache = {}
+        self.buildings = []
+        self.spots = []
 
     def findIntersections(self):
         # excuse how obnoxious this section is
@@ -62,17 +64,17 @@ class Game():
     def drawGridLines(self):
         w, h = pygame.display.get_surface().get_size()
         if self.displayGridLines:
-            for x in range(0, w, consts.TILESIZE):
+            for x in range(0, w, 32):
                 pygame.draw.rect(WIN,
-                                 consts.WHITE,
+                                 c.WHITE,
                                  pygame.Rect((x - 1, 0), (1, h)))
-            for y in range(0, h, consts.TILESIZE):
+            for y in range(0, h, 32):
                 pygame.draw.rect(WIN,
-                                 consts.WHITE,
+                                 c.WHITE,
                                  pygame.Rect((0, y - 1), (w, 1)))
 
     def drawWindow(self):
-        WIN.fill(consts.BLACK)
+        WIN.fill(c.BLACK)
         self.drawRoads()
         for gridObj in self.grid:
             gridObj.draw(WIN)
@@ -80,34 +82,73 @@ class Game():
             self.drawGridLines()
         pygame.display.update()
 
-    def addGridObject(self, pos = (0, 0), color = consts.BLUE, size = (1, 1)):
-        self.grid.append(go.GridObject(pos, color, size))
+    def addGridObject(self, pos = (0, 0), color = c.BLUE, size = (1, 1)):
+        obj = go.GridObject(pos, color, size)
+        self.grid.append(obj)
+        for i in range(1, size[0]):
+            for j in range(1, size[1]):
+                self.cache[(i, j)] = c.GRIDOBJ, obj
 
-    def addVehicle(self, pos, color = consts.GREEN):
-        self.grid.append(v.Vehicle(pos, color))
+    def addVehicle(self, pos, color = c.GREEN):
+        vehic = v.Vehicle(pos, color)
+        self.grid.append(vehic)
 
-    def addBuilding(self, pos, color = consts.GREY):
-        self.grid.append(b.Building(pos, color))
+    def addBuilding(self, pos, color = c.GREY):
+        build = b.Building(pos, color)
+        self.grid.append(build)
+        self.cache[pos] = c.BUILDING, build
+        self.buildings.append(build)
 
-    def addParking(self, pos, color = consts.YELLOW):
-        self.grid.append(p.Parking(pos, color))
+    def addParking(self, pos, orientation = 0, color = c.YELLOW):
+        park = p.Parking(pos, orientation, color)
+        self.grid.append(park)
+        self.cache[pos] = c.PARKING, park
+        self.spots.append(park)
 
-    def addRoad(self, start, end, color = consts.DARKGREY):
+    def addRoad(self, start, end, color = c.DARKGREY):
         road = r.Road(start, end, color)
         if road.vertical is None:
             print("Can't add a road which isn't aligned to an axis")
         else:
             if road.vertical:
                 self.yAxisRoads.append(road)
+                x = start[0]
+                for y in range(start[1], end[1]):
+                    self.cache[(x - 1, y)] = c.ROAD, road
+                    self.cache[(x, y)] = c.ROAD, road
             else:
                 self.xAxisRoads.append(road)
+                y = start[1]
+                for x in range(start[0], end[0]):
+                    self.cache[(x, y - 1)] = c.ROAD, road
+                    self.cache[(x, y)] = c.ROAD, road
 
     def addIntersection(self, pos, isNonintersection):
-        self.intersections.append(i.Intersection(pos, isNonintersection))
+        intersect = i.Intersection(pos, isNonintersection)
+        self.intersections.append(intersect)
+        x, y = pos[0] // 32, pos[1] // 32
+        self.cache[(x, y)] = c.INTERSECTION, intersect
+        self.cache[(x - 1, y)] = c.INTERSECTION, intersect
+        self.cache[(x, y - 1)] = c.INTERSECTION, intersect
+        self.cache[(x - 1, y - 1)] = c.INTERSECTION, intersect        
 
     def initGrid(self):
+        self.addRoad((1, 0), (1, 10))
+        self.addRoad((5, 0), (5, 10))
+        self.addRoad((9, 0), (9, 10))
+        self.addRoad((0, 1), (10, 1))
         self.addRoad((0, 5), (10, 5))
-        self.addRoad((5, 0), (5, 10))        
+        self.addRoad((0, 9), (10, 9))
+        self.addBuilding((10, 0))
+        self.addBuilding((9, 10))
+        self.addBuilding((0, 10))
+        self.addParking((2, 10))
+        self.addParking((5, 10))
+        self.addParking((6, 3))
+        self.addParking((10, 2))
+        self.addVehicle((0, 0), c.RED)
+        #self.addVehicle((6, 4), c.BLUE)
+        #self.addVehicle((7, 9), c.GREEN)
 
     def handleKeypress(self, key):
         if key == pygame.K_g:
@@ -120,8 +161,12 @@ class Game():
             self.tickInterval = 60
 
     def step(self):
+        vehicLocs = {}
         for gridObj in self.grid:
-            gridObj.step()
+            if isinstance(gridObj, v.Vehicle):
+                vehicLocs[gridObj.pos] = True
+        for gridObj in self.grid:
+            gridObj.step(self.cache, vehicLocs, self.buildings, self.spots)
 
     def main(self):
         clock = pygame.time.Clock()
